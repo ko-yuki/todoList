@@ -8,5 +8,13 @@ export default defineConfig({
     { path: '/', component: '@/pages/index' },
   ], */
   fastRefresh: {},
-  base: '/dist'
+  publicPath: './',
+  history: {
+    type: 'hash'
+  },
+  exportStatic: {
+    htmlSuffix: true,
+    dynamicRoot: true,
+    supportWin: true,
+  },
 });

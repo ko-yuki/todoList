@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { Form, Input, Checkbox, Card, Button, Tooltip, message, Empty } from 'antd';
+import { Form, Input, Checkbox, Card, Button, Tooltip, message, Empty, Row, Col, Popconfirm } from 'antd';
 import { useState, useEffect } from 'react';
 
 interface Task {
@@ -13,6 +13,11 @@ interface State {
   doneList: Task[];
 }
 
+interface DeleteState {
+  todoList: number[];
+  doneList: number[];
+}
+
 message.config({
   top: 100,
   duration: 2,
@@ -22,6 +27,7 @@ message.config({
 export default function IndexPage() {
 
   const [state, setState] = useState<State>({ todoList: [], doneList: [] });
+  const [deleteState, setDeleteState] = useState<DeleteState>({ todoList: [], doneList: [] });
   const addForm = Form.useForm();
 
   // 初始化从localStorage中获取任务列表
@@ -73,6 +79,22 @@ export default function IndexPage() {
     setState({ todoList: newTodoList, doneList: has });
   }
 
+  // 删除未完成
+  function handelDeleteTodo() {
+    const { todoList } = deleteState;
+    const newTodoList = state.todoList.filter(t => !todoList.includes(t.key));
+    setState({ ...state, todoList: newTodoList });
+    setDeleteState({ ...deleteState, todoList: [] });
+  }
+
+  // 删除已完成
+  function handelDeleteDone() {
+    const { doneList } = deleteState;
+    const newDoneList = state.doneList.filter(t => !doneList.includes(t.key));
+    setState({ ...state, doneList: newDoneList });
+    setDeleteState({ ...deleteState, doneList: [] });
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.taskListBox}>
@@ -80,10 +102,31 @@ export default function IndexPage() {
           <Card bordered title='待完成任务'>
             {
               state.todoList.length ?
-                <Form onFinish={handelFinish} initialValues={{ todoList: [...state.todoList] }}>
-                  <Form.Item>
-                    <Button type='primary' htmlType='submit'>完成</Button>
-                  </Form.Item>
+                <Form
+                  onFinish={handelFinish}
+                  initialValues={{ todoList: [...state.todoList] }}
+                  onValuesChange={v => setDeleteState({ ...deleteState, todoList: v.todoList || [] })}
+                >
+                  <Row gutter={30}>
+                    <Col>
+                      <Form.Item>
+                        <Button type='primary' htmlType='submit'>完成</Button>
+                      </Form.Item>
+                    </Col>
+                    <Col>
+                      <Form.Item>
+                        <Popconfirm
+                          title='确定删除选中项？'
+                          onConfirm={handelDeleteTodo}
+                          okText='确认'
+                          cancelText='取消'
+                          disabled={deleteState.todoList.length === 0}
+                        >
+                          <Button danger type='primary' disabled={deleteState.todoList.length === 0}>删除</Button>
+                        </Popconfirm>
+                      </Form.Item>
+                    </Col>
+                  </Row>
                   <Form.Item name='todoList' className={styles.todoListBox}>
                     <Checkbox.Group>
                       {state.todoList.map(t => (
@@ -104,10 +147,32 @@ export default function IndexPage() {
           <Card bordered title='已完成任务'>
             {
               state.doneList.length ?
-                <Form onFinish={handelRevoke} initialValues={{ doneList: [...state.doneList] }}>
-                  <Form.Item>
-                    <Button type='primary' htmlType='submit'>撤销</Button>
-                  </Form.Item>
+                <Form
+                  onFinish={handelRevoke}
+                  initialValues={{ doneList: [...state.doneList] }}
+                  onValuesChange={v => setDeleteState({ ...deleteState, doneList: v.doneList || [] })}
+                >
+                  <Row gutter={30}>
+                    <Col>
+                      <Form.Item>
+                        <Button type='primary' htmlType='submit'>撤销</Button>
+                      </Form.Item>
+                    </Col>
+                    <Col>
+                      <Form.Item>
+                        <Popconfirm
+                          title='确定删除选中项？'
+                          onConfirm={handelDeleteDone}
+                          okText='确认'
+                          cancelText='取消'
+                          disabled={deleteState.doneList.length === 0}
+                        >
+                          <Button danger type='primary' htmlType='submit' disabled={deleteState.doneList.length === 0}>删除</Button>
+                        </Popconfirm>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
                   <Form.Item name='doneList' className={styles.doneListBox}>
                     <Checkbox.Group>
                       {state.doneList.map(t => (
