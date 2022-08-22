@@ -29,6 +29,8 @@ export default function IndexPage() {
   const [state, setState] = useState<State>({ todoList: [], doneList: [] });
   const [deleteState, setDeleteState] = useState<DeleteState>({ todoList: [], doneList: [] });
   const addForm = Form.useForm();
+  const todoForm = Form.useForm();
+  const doneForm = Form.useForm();
 
   // 初始化从localStorage中获取任务列表
   useEffect(() => {
@@ -64,6 +66,10 @@ export default function IndexPage() {
     const has = todoList.filter(t => !value.todoList.includes(t.key));
 
     setState({ todoList: has, doneList: newDoneList });
+    setDeleteState({ ...deleteState, todoList: [] });
+
+    todoForm[0].resetFields();
+    doneForm[0].resetFields();
   }
 
   // 撤销已完成
@@ -77,6 +83,10 @@ export default function IndexPage() {
     const has = doneList.filter(t => !value.doneList.includes(t.key));
 
     setState({ todoList: newTodoList, doneList: has });
+    setDeleteState({ ...deleteState, doneList: [] });
+
+    todoForm[0].resetFields();
+    doneForm[0].resetFields();
   }
 
   // 删除未完成
@@ -85,6 +95,8 @@ export default function IndexPage() {
     const newTodoList = state.todoList.filter(t => !todoList.includes(t.key));
     setState({ ...state, todoList: newTodoList });
     setDeleteState({ ...deleteState, todoList: [] });
+
+    message.success('删除成功！');
   }
 
   // 删除已完成
@@ -93,6 +105,8 @@ export default function IndexPage() {
     const newDoneList = state.doneList.filter(t => !doneList.includes(t.key));
     setState({ ...state, doneList: newDoneList });
     setDeleteState({ ...deleteState, doneList: [] });
+
+    message.success('删除成功！');
   }
 
   return (
@@ -106,6 +120,7 @@ export default function IndexPage() {
                   onFinish={handelFinish}
                   initialValues={{ todoList: [...state.todoList] }}
                   onValuesChange={v => setDeleteState({ ...deleteState, todoList: v.todoList || [] })}
+                  form={todoForm[0]}
                 >
                   <Row gutter={30}>
                     <Col>
@@ -151,6 +166,7 @@ export default function IndexPage() {
                   onFinish={handelRevoke}
                   initialValues={{ doneList: [...state.doneList] }}
                   onValuesChange={v => setDeleteState({ ...deleteState, doneList: v.doneList || [] })}
+                  form={doneForm[0]}
                 >
                   <Row gutter={30}>
                     <Col>
