@@ -6,4 +6,4 @@
 
 ### 访问demo
 
-`https://xuezhong0.github.io/todoList/dist/index.html#/`
+https://xuezhong0.github.io/todoList/dist/index.html#/
