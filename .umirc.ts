@@ -17,4 +17,5 @@ export default defineConfig({
     dynamicRoot: true,
     supportWin: true,
   },
+  favicon: './favicon.ico',
 });
